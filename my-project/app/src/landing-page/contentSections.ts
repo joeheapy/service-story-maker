@@ -1,15 +1,15 @@
-import type { NavigationItem } from '../client/components/NavBar/NavBar';
-import { routes } from 'wasp/client/router';
-import { DocsUrl, BlogUrl } from '../shared/common';
-import daBoiAvatar from '../client/static/da-boi.webp';
-import avatarPlaceholder from '../client/static/avatar-placeholder.webp';
+import type { NavigationItem } from '../client/components/NavBar/NavBar'
+import { routes } from 'wasp/client/router'
+import { DocsUrl, BlogUrl } from '../shared/common'
+import daBoiAvatar from '../client/static/da-boi.webp'
+import avatarPlaceholder from '../client/static/avatar-placeholder.webp'
 
 export const landingPageNavigationItems: NavigationItem[] = [
   { name: 'Features', to: '#features' },
   { name: 'Pricing', to: routes.PricingPageRoute.to },
   { name: 'Documentation', to: DocsUrl },
   { name: 'Blog', to: BlogUrl },
-];
+]
 export const features = [
   {
     name: 'Cool Feature #1',
@@ -35,7 +35,7 @@ export const features = [
     icon: '💸',
     href: DocsUrl,
   },
-];
+]
 export const testimonials = [
   {
     name: 'Da Boi',
@@ -58,7 +58,7 @@ export const testimonials = [
     socialUrl: '#',
     quote: 'My cats love it!',
   },
-];
+]
 
 export const faqs = [
   {
@@ -67,7 +67,7 @@ export const faqs = [
     answer: '42.',
     href: 'https://en.wikipedia.org/wiki/42_(number)',
   },
-];
+]
 export const footerNavigation = {
   app: [
     { name: 'Documentation', href: DocsUrl },
@@ -78,4 +78,4 @@ export const footerNavigation = {
     { name: 'Privacy', href: '#' },
     { name: 'Terms of Service', href: '#' },
   ],
-};
+}
