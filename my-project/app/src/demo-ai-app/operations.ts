@@ -1,4 +1,4 @@
-import type { Task, GptResponse } from 'wasp/entities';
+import type { Task, GptResponse } from 'wasp/entities'
 import type {
   GenerateGptResponse,
   CreateTask,
@@ -6,27 +6,30 @@ import type {
   UpdateTask,
   GetGptResponses,
   GetAllTasksByUser,
-} from 'wasp/server/operations';
-import { HttpError } from 'wasp/server';
-import { GeneratedSchedule } from './schedule';
-import OpenAI from 'openai';
+} from 'wasp/server/operations'
+import { HttpError } from 'wasp/server'
+import { GeneratedSchedule } from './schedule'
+import OpenAI from 'openai'
 
-const openai = setupOpenAI();
+const openai = setupOpenAI()
 function setupOpenAI() {
   if (!process.env.OPENAI_API_KEY) {
-    return new HttpError(500, 'OpenAI API key is not set');
+    return new HttpError(500, 'OpenAI API key is not set')
   }
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 }
 
 //#region Actions
 type GptPayload = {
-  hours: string;
-};
+  hours: string
+}
 
-export const generateGptResponse: GenerateGptResponse<GptPayload, GeneratedSchedule> = async ({ hours }, context) => {
+export const generateGptResponse: GenerateGptResponse<
+  GptPayload,
+  GeneratedSchedule
+> = async ({ hours }, context) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401)
   }
 
   const tasks = await context.entities.Task.findMany({
@@ -35,30 +38,31 @@ export const generateGptResponse: GenerateGptResponse<GptPayload, GeneratedSched
         id: context.user.id,
       },
     },
-  });
+  })
 
   const parsedTasks = tasks.map(({ description, time }) => ({
     description,
     time,
-  }));
+  }))
 
   try {
     // check if openai is initialized correctly with the API key
     if (openai instanceof Error) {
-      throw openai;
+      throw openai
     }
 
-    const hasCredits = context.user.credits > 0;
+    // check if user has credits or a valid subscription
+    const hasCredits = context.user.credits > 0
     const hasValidSubscription =
       !!context.user.subscriptionStatus &&
       context.user.subscriptionStatus !== 'deleted' &&
-      context.user.subscriptionStatus !== 'past_due';
-    const canUserContinue = hasCredits || hasValidSubscription;
+      context.user.subscriptionStatus !== 'past_due'
+    const canUserContinue = hasCredits || hasValidSubscription
 
     if (!canUserContinue) {
-      throw new HttpError(402, 'User has not paid or is out of credits');
+      throw new HttpError(402, 'User has not paid or is out of credits')
     } else {
-      console.log('decrementing credits');
+      console.log('decrementing credits')
       await context.entities.User.update({
         where: { id: context.user.id },
         data: {
@@ -66,7 +70,7 @@ export const generateGptResponse: GenerateGptResponse<GptPayload, GeneratedSched
             decrement: 1,
           },
         },
-      });
+      })
     }
 
     const completion = await openai.chat.completions.create({
@@ -95,7 +99,8 @@ export const generateGptResponse: GenerateGptResponse<GptPayload, GeneratedSched
               properties: {
                 mainTasks: {
                   type: 'array',
-                  description: 'Name of main tasks provided by user, ordered by priority',
+                  description:
+                    'Name of main tasks provided by user, ordered by priority',
                   items: {
                     type: 'object',
                     properties: {
@@ -123,7 +128,8 @@ export const generateGptResponse: GenerateGptResponse<GptPayload, GeneratedSched
                       },
                       time: {
                         type: 'number',
-                        description: 'time allocated for a given subtask in hours, e.g. 0.5',
+                        description:
+                          'time allocated for a given subtask in hours, e.g. 0.5',
                       },
                       mainTaskName: {
                         type: 'string',
@@ -145,24 +151,25 @@ export const generateGptResponse: GenerateGptResponse<GptPayload, GeneratedSched
         },
       },
       temperature: 1,
-    });
+    })
 
-    const gptArgs = completion?.choices[0]?.message?.tool_calls?.[0]?.function.arguments;
+    const gptArgs =
+      completion?.choices[0]?.message?.tool_calls?.[0]?.function.arguments
 
     if (!gptArgs) {
-      throw new HttpError(500, 'Bad response from OpenAI');
+      throw new HttpError(500, 'Bad response from OpenAI')
     }
 
-    console.log('gpt function call arguments: ', gptArgs);
+    console.log('gpt function call arguments: ', gptArgs)
 
     await context.entities.GptResponse.create({
       data: {
         user: { connect: { id: context.user.id } },
         content: JSON.stringify(gptArgs),
       },
-    });
+    })
 
-    return JSON.parse(gptArgs);
+    return JSON.parse(gptArgs)
   } catch (error: any) {
     if (!context.user.subscriptionStatus && error?.statusCode != 402) {
       await context.entities.User.update({
@@ -172,18 +179,21 @@ export const generateGptResponse: GenerateGptResponse<GptPayload, GeneratedSched
             increment: 1,
           },
         },
-      });
+      })
     }
-    console.error(error);
-    const statusCode = error.statusCode || 500;
-    const errorMessage = error.message || 'Internal server error';
-    throw new HttpError(statusCode, errorMessage);
+    console.error(error)
+    const statusCode = error.statusCode || 500
+    const errorMessage = error.message || 'Internal server error'
+    throw new HttpError(statusCode, errorMessage)
   }
-};
+}
 
-export const createTask: CreateTask<Pick<Task, 'description'>, Task> = async ({ description }, context) => {
+export const createTask: CreateTask<Pick<Task, 'description'>, Task> = async (
+  { description },
+  context
+) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401)
   }
 
   const task = await context.entities.Task.create({
@@ -191,14 +201,17 @@ export const createTask: CreateTask<Pick<Task, 'description'>, Task> = async ({ 
       description,
       user: { connect: { id: context.user.id } },
     },
-  });
+  })
 
-  return task;
-};
+  return task
+}
 
-export const updateTask: UpdateTask<Partial<Task>, Task> = async ({ id, isDone, time }, context) => {
+export const updateTask: UpdateTask<Partial<Task>, Task> = async (
+  { id, isDone, time },
+  context
+) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401)
   }
 
   const task = await context.entities.Task.update({
@@ -209,30 +222,36 @@ export const updateTask: UpdateTask<Partial<Task>, Task> = async ({ id, isDone, 
       isDone,
       time,
     },
-  });
+  })
 
-  return task;
-};
+  return task
+}
 
-export const deleteTask: DeleteTask<Pick<Task, 'id'>, Task> = async ({ id }, context) => {
+export const deleteTask: DeleteTask<Pick<Task, 'id'>, Task> = async (
+  { id },
+  context
+) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401)
   }
 
   const task = await context.entities.Task.delete({
     where: {
       id,
     },
-  });
+  })
 
-  return task;
-};
+  return task
+}
 //#endregion
 
 //#region Queries
-export const getGptResponses: GetGptResponses<void, GptResponse[]> = async (_args, context) => {
+export const getGptResponses: GetGptResponses<void, GptResponse[]> = async (
+  _args,
+  context
+) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401)
   }
   return context.entities.GptResponse.findMany({
     where: {
@@ -240,12 +259,15 @@ export const getGptResponses: GetGptResponses<void, GptResponse[]> = async (_arg
         id: context.user.id,
       },
     },
-  });
-};
+  })
+}
 
-export const getAllTasksByUser: GetAllTasksByUser<void, Task[]> = async (_args, context) => {
+export const getAllTasksByUser: GetAllTasksByUser<void, Task[]> = async (
+  _args,
+  context
+) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401)
   }
   return context.entities.Task.findMany({
     where: {
@@ -256,6 +278,6 @@ export const getAllTasksByUser: GetAllTasksByUser<void, Task[]> = async (_args, 
     orderBy: {
       createdAt: 'desc',
     },
-  });
-};
+  })
+}
 //#endregion

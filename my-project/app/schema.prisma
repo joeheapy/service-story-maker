@@ -35,7 +35,7 @@ model GptResponse {
   createdAt                 DateTime        @default(now())
   updatedAt                 DateTime        @updatedAt
 
-  user                      User            @relation(fields: [userId], references: [id])
+  user                      User            @relation(fields: [userId], references: [id], onDelete: Cascade) // Added onDelete
   userId                    String
 
   content                   String
@@ -45,7 +45,7 @@ model Task {
   id                        String          @id @default(uuid())
   createdAt                 DateTime        @default(now())
 
-  user                      User            @relation(fields: [userId], references: [id])
+  user                      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                    String
 
   description               String
@@ -57,7 +57,7 @@ model File {
   id                        String          @id @default(uuid())
   createdAt                 DateTime        @default(now())
 
-  user                      User            @relation(fields: [userId], references: [id])
+  user                      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                    String
 
   name                      String
@@ -87,7 +87,7 @@ model PageViewSource {
   name                     String
   date                     DateTime        @default(now())
 
-  dailyStats               DailyStats?     @relation(fields: [dailyStatsId], references: [id])
+  dailyStats               DailyStats?     @relation(fields: [dailyStatsId], references: [id], onDelete: Cascade)
   dailyStatsId             Int?
 
   visitors                 Int
@@ -105,7 +105,7 @@ model ContactFormMessage {
   id                        String          @id @default(uuid())
   createdAt                 DateTime        @default(now())
 
-  user                      User            @relation(fields: [userId], references: [id])
+  user                      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                    String
 
   content                   String

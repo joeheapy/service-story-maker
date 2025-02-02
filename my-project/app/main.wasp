@@ -3,7 +3,7 @@ app OpenSaaS {
     version: "^0.15.0"
   },
 
-  title: "My Open SaaS App",
+  title: "Service Story Maker",
 
   head: [
     // Meta tags for the HTML head section
@@ -35,7 +35,7 @@ app OpenSaaS {
   ],
 
   // 🔐 Auth out of the box! https://wasp-lang.dev/docs/auth/overview
-  auth: {
+   auth: {
     userEntity: User,
     methods: {
       // NOTE: If you decide to not use email auth, make sure to also delete the related routes and pages below.
@@ -43,7 +43,7 @@ app OpenSaaS {
       email: {
         fromField: {
           name: "Open SaaS App",
-          email: "contact@publicgoods.design"
+          email: "me@example.com"
         },
         emailVerification: {
           clientRoute: EmailVerificationRoute,
@@ -73,7 +73,8 @@ app OpenSaaS {
     },
     onAfterSignup: import { onAfterSignup } from "@src/auth/hooks",
     onAuthFailedRedirectTo: "/login",
-    onAuthSucceededRedirectTo: "/demo-app",
+    // onAuthSucceededRedirectTo: "/demo-app",  
+    onAuthSucceededRedirectTo: "/service-story-maker",  
   },
 
   db: {
@@ -92,7 +93,7 @@ app OpenSaaS {
     // NOTE: "Dummy" provider is just for local development purposes.
     //   Make sure to check the server logs for the email confirmation url (it will not be sent to an address)!
     //   Once you are ready for production, switch to e.g. "SendGrid" or "Mailgun" providers. Check out https://docs.opensaas.sh/guides/email-sending/ .
-    provider: SendGrid,
+    provider: Dummy,
     defaultFrom: {
       name: "Open SaaS App",
       // When using a real provider, e.g. SendGrid, you must use the same email address that you configured your account to send out emails with!
@@ -157,6 +158,14 @@ action updateUserById {
 //#endregion
 
 //#region Demo AI App
+route ServiceStoryRoute { path: "/service-story-maker", to: Page }
+page Page {
+  authRequired: true,
+  component: import DemoAppPage from "@src/service-story-maker/Page"
+}
+
+
+
 route DemoAppRoute { path: "/demo-app", to: DemoAppPage }
 page DemoAppPage {
   authRequired: true,
