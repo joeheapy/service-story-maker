@@ -43,9 +43,9 @@ export const paymentPlans: Record<PaymentPlanId, PaymentPlan> = {
 
 export function prettyPaymentPlanName(planId: PaymentPlanId): string {
   const planToName: Record<PaymentPlanId, string> = {
-    [PaymentPlanId.Credits10]: '10 Credits',
-    [PaymentPlanId.Credits50]: '50 Credits',
-    [PaymentPlanId.Credits500]: '500 Credits',
+    [PaymentPlanId.Credits10]: '10 Tokens',
+    [PaymentPlanId.Credits50]: '50 Tokens',
+    [PaymentPlanId.Credits500]: '500 Tokens',
   }
   return planToName[planId]
 }

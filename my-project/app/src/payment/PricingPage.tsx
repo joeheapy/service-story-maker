@@ -24,19 +24,19 @@ export const paymentPlanCards: Record<PaymentPlanId, PaymentPlanCard> = {
     name: prettyPaymentPlanName(PaymentPlanId.Credits10),
     price: '$10.00',
     description: 'All you need to get started',
-    features: ['Limited monthly usage', 'Basic support'],
+    features: ['Do a few things with this', 'Get a taste for it'],
   },
   [PaymentPlanId.Credits50]: {
     name: prettyPaymentPlanName(PaymentPlanId.Credits50),
     price: '$18.00',
-    description: 'Our most popular plan',
-    features: ['Unlimited monthly usage', 'Priority customer support'],
+    description: 'One complete package',
+    features: ['Very good features', 'A great feature'],
   },
   [PaymentPlanId.Credits500]: {
     name: prettyPaymentPlanName(PaymentPlanId.Credits500),
     price: '$89.00',
-    description: 'One-time purchase of 10 credits for your account',
-    features: ['Use credits for e.g. OpenAI API calls', 'No expiration date'],
+    description: 'Plenty of credits to experiement with',
+    features: ["You'll like this part", 'Something else'],
   },
 }
 
